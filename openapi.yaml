@@ -44,10 +44,10 @@ paths:
                   required:
                     - login
                     - hash
-                    - id
                     - first_name
                     - last_name
                     - group
+                    - club
       responses:
         '201':
           description: 'OK'
@@ -228,10 +228,8 @@ components:
           type: string
         is_searching:
           type: boolean
-        clubs:
-          type: array
-          items:
-            type: string
+        club:
+          $ref: '#/components/schemas/Club'
 
     Error:
       type: object

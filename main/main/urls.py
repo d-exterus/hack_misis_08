@@ -20,6 +20,11 @@ from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/create', views.create_auth),
-    path('user/create', views.create_user)
+    path('user/create', views.user_create),
+    path('user/<int:id>', views.user_get),
+    path('team/create', views.team_create),
+    path('team/<int:id>', views.team_get),
+    path('leaderboard', views.leaderboard)
+    # path('auth/create', views.create_auth),
+    # path('user/create', views.create_user)
 ]
