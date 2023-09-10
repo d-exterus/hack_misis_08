@@ -1,0 +1,282 @@
+openapi: 3.1.0
+info:
+  title: main_api
+  description: main_api
+  version: 1.0.0
+paths:
+  /token:
+    get:
+      summary: get user by token
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+            description: 'OK'
+            content:
+              'application/json':
+                schema:
+                  $ref: '#/components/schemas/User'
+        '404':
+            description: 'Not found'
+            content:
+              'application/json':
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /user/create:
+    post:
+      summary: create user
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/User'
+                - type: object
+                  properties:
+                    login:
+                      type: string
+                    hash:
+                      type: string
+                  required:
+                    - login
+                    - hash
+                    - id
+                    - first_name
+                    - last_name
+                    - group
+      responses:
+        '201':
+          description: 'OK'
+  /user/{id}:
+    get:
+      summary: get user by id
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Not found
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/{id}/achivements:
+    post:
+      summary: add achievement to a user
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              description: "achievements' id"
+              type: array
+              items:
+                type: integer
+      responses:
+        204:
+          description: 'user has been updated'
+        404:
+          $ref: '#/components/schemas/Error'
+    get:
+      summary: get achievements of a user
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Achievement'
+        404:
+          $ref: '#/components/schemas/Error'
+
+
+  /team/create:
+    post:
+      summary: create a team
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Team'
+                - type: object
+                  required:
+                    - name
+                    - users
+                    - club
+      responses:
+        '201':
+          $ref: '#/components/responses/TeamResponse'
+        '400':
+          $ref: '#/components/schemas/Error'
+
+  /team/{id}:
+    get:
+      summary: get team by id
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          $ref: '#/components/responses/TeamResponse'
+        '404':
+          $ref: '#/components/schemas/Error'
+
+  /team/{id}/achivements:
+    post:
+      summary: add achievement to a team
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              description: "achievements' id"
+              type: array
+              items:
+                type: integer
+      responses:
+        204:
+          description: 'team has been updated'
+        404:
+          $ref: '#/components/schemas/Error'
+    get:
+      summary: get achievements of a team
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Achievement'
+        404:
+          $ref: '#/components/schemas/Error'
+
+  /leaderboard:
+    get:
+      summary: get a leaderboard
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - TEAM
+              - USER
+      responses:
+        200:
+          description: OK
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Team'
+
+
+
+
+
+
+
+components:
+  schemas:
+    Club:
+      type: string
+      enum:
+        - HACK
+        - GAME
+        - DESIGN
+        - ROBOTS
+        - AI
+        - LECTURES
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        bio:
+          type: string
+        group:
+          type: string
+        is_searching:
+          type: boolean
+        clubs:
+          type: array
+          items:
+            type: string
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: integer
+        description:
+          type: string
+
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        users:
+          description: "users' id"
+          type: array
+          items:
+            type: integer
+        clubs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Club'
+
+    Achievement:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+  responses:
+    TeamResponse:
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Team'
+  parameters:
+    IdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
